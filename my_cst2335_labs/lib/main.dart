@@ -13,11 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Browse Categories',
-      theme: ThemeData(
-        // This is the theme of your application.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: ''),
     );
   }
 }
@@ -33,39 +29,6 @@ class MyHomePage extends StatefulWidget {
 
 
 class _MyHomePageState extends State<MyHomePage> {
-  late TextEditingController _controllerName; //this is to read the login
-  late TextEditingController _controllerPass; //this is to read the password
-  // initializes the var for imagepath, starting with the question mark image
-  String _imagePath = 'assets/images/question-mark.png';
-  //lololol, I thought i had a directory error, turns out I just forgot the full
-  // dir
-  void buttonClicked(){
-    setState(() {
-      //checks password, looked up .text
-      if(_controllerPass.text =="QWERTY123"){
-        _imagePath = 'assets/images/idea.png';}
-      else{
-        _imagePath = 'assets/images/stop.png';}
-    });
-
-  }
-
-  var isChecked = false;
-
-  @override
-  void initState() { //similar to onloaded=
-    super.initState();
-
-    _controllerName = TextEditingController(); //making _controller
-    _controllerPass = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _controllerName.dispose();
-    _controllerPass.dispose();
-    super.dispose(); // free the memory of what was typed
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,30 +42,336 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
 
-        child: Column(
+        child:
+    Padding(
+    padding: EdgeInsets.only(top: 20, left: 20,right: 20),  // Adjust 20px as needed
+    child:
+    Column(
 
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            TextField(controller: _controllerName,
-                decoration: InputDecoration(
-                    hintText:"Type here",
-                    border: OutlineInputBorder(),
-                    labelText: "Login"
-                )),
-            TextField(controller: _controllerPass,
-                decoration: InputDecoration(
-                    hintText:"Type here",
-                    border: OutlineInputBorder(),
-                    labelText: "Password"
-                )),
+            Text(
+              'BROWSE CATEGORIES',
+              style: TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+                "Not sure about exactly which recipe you're looking for? Do a search, or dive into our most popular categories.",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontFamily: 'Arial',
+                  color: Colors.black,
+                ),
+              ),
+            Text(
+              'BY MEAT',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [ CircleAvatar( // looking back on this, reading the
+                    // entire instructions before starting is helpful
+                    radius: 100,
+                    backgroundImage: AssetImage('assets/images/beef.jpg'),
+                    child: const Text(
+                      'BEEF',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.black,
+                            offset: Offset(2, 2),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                CircleAvatar( // looking back on this, reading the
+                  // entire instructions before starting is helpful
+                  radius: 100,
+                  backgroundImage: AssetImage('assets/images/chicken.jpg'),
+                  child: const Text(
+                    'CHICKEN',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black,
+                          offset: Offset(2, 2),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                CircleAvatar( // looking back on this, reading the
+                  // entire instructions before starting is helpful
+                  radius: 100,
+                  backgroundImage: AssetImage('assets/images/pork.jpg'),
+                  child: const Text(
+                    'PORK',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black,
+                          offset: Offset(2, 2),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                CircleAvatar( // looking back on this, reading the
+                  // entire instructions before starting is helpful
+                  radius: 100,
+                  backgroundImage: AssetImage('assets/images/seafood.jpg'),
+                  child: const Text(
+                    'SEAFOOD',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black,
+                          offset: Offset(2, 2),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
 
-            ElevatedButton( onPressed: buttonClicked, child:  Text("Login")) ,
-            SizedBox(height: 20),
-            // sets image displayed to _imagepath, the default is the quesiton mark
-            Semantics(child: Image.asset(_imagePath, width: 300, height: 300),
-                label:"Question Mark"   ),
+              ]
+            ),
+            Text(
+              'BY COURSE',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [ Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: Image.asset(
+                          'assets/images/maindish.jpg',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Main Dishes',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.asset(
+                            'assets/images/Salad.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Salad Recipes',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.asset(
+                            'assets/images/sidedish.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Side Dishes',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.asset(
+                            'assets/images/crockpot.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Crockpot',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                ]
+            ),
+            Text(
+              'BY DESSERT',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [ Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: Image.asset(
+                          'assets/images/icecream.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Ice Cream',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        ),
+                    ),
+                  ],
+                ),
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.asset(
+                            'assets/images/Brownies.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Brownies',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.asset(
+                            'assets/images/Pie.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Pies',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Image.asset(
+                            'assets/images/cookies.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Cookies',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                ]
+            ),
           ],
         ),
+    ),
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
