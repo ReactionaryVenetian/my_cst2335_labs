@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //test fsdfds
 void main() {
   runApp(const MyApp());
+}
+// Load and obtain the shared preferences for this app.
+void functionName() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // Example: Saving a value
+  prefs.setString("_controllerName", "User123");
+
+  // Example: Retrieving a value
+  String? storedLogin = prefs.getString("_controllerPass");
+  print("Stored Login: $storedLogin");
 }
 
 class MyApp extends StatelessWidget {
@@ -43,7 +55,43 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       //checks password, looked up .text
       if(_controllerPass.text =="QWERTY123"){
-        _imagePath = 'assets/images/idea.png';}
+        _imagePath = 'assets/images/idea.png';
+        showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Would you like to save your login and password?'),
+
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // need to readup on this, apparently saved to a local file so
+                // I'll need admin permission?
+                SharedPreferences.getInstance().then((prefs) {
+                  prefs.setString("LoginName", _controllerName.text);
+                  prefs.setString("Password", _controllerPass.text);
+                });
+
+                Navigator.of(context).pop();
+              },
+
+              child: Text("Save"),
+            ),
+
+            TextButton(
+              onPressed: () {
+                SharedPreferences.getInstance().then((prefs) {
+                 prefs.remove("LoginName"); // removes saved data
+                 prefs.remove("Password"); // removes saved data
+                });
+                Navigator.of(context).pop(); // closes box
+              },
+
+              child: Text("Don't save"),
+            ),
+          ],
+
+        ),
+      );}
       else{
         _imagePath = 'assets/images/stop.png';}
     });
@@ -58,6 +106,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _controllerName = TextEditingController(); //making _controller
     _controllerPass = TextEditingController();
+
+    SharedPreferences.getInstance().then((prefs) {
+      String? savedLogin = prefs.getString("LoginName");
+      String? savedPass = prefs.getString("Password");
+
+      if (savedLogin != null && savedPass != null) { //checks if pass is saved
+        _controllerName.text = savedLogin; // populates fields
+        _controllerPass.text = savedPass; // populates fields
+
+        ScaffoldMessenger.of(context).showSnackBar( // displays allah-snackbar!
+          SnackBar(content: Text("Saved login details autocompleted")),
+        );
+      }
+    });
+
   }
 
   @override
