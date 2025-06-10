@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//test fsdfds
+import 'profilepage.dart';// interesting, you gotta actually import it
+
 void main() {
   runApp(const MyApp());
 }
@@ -72,6 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
 
                 Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage(loginName: _controllerName.text)),
+                );
+
               },
 
               child: Text("Save"),
@@ -84,6 +90,10 @@ class _MyHomePageState extends State<MyHomePage> {
                  prefs.remove("Password"); // removes saved data
                 });
                 Navigator.of(context).pop(); // closes box
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage(loginName: _controllerName.text)),
+                );
               },
 
               child: Text("Don't save"),
@@ -108,8 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _controllerPass = TextEditingController();
 
     SharedPreferences.getInstance().then((prefs) {
-      String? savedLogin = prefs.getString("LoginName");
-      String? savedPass = prefs.getString("Password");
+      String? savedLogin = prefs.getString("LoginName"); // setString saves data
+      String? savedPass = prefs.getString("Password"); // here saved pass is
+      // assigned to the string savedPass
 
       if (savedLogin != null && savedPass != null) { //checks if pass is saved
         _controllerName.text = savedLogin; // populates fields
