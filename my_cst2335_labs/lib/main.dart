@@ -1,184 +1,169 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'profilepage.dart';// interesting, you gotta actually import it
 
-void main() {
-  runApp(const MyApp());
-}
-// Load and obtain the shared preferences for this app.
-void functionName() async {
-  final prefs = await SharedPreferences.getInstance();
-
-  // Example: Saving a value
-  prefs.setString("_controllerName", "User123");
-
-  // Example: Retrieving a value
-  String? storedLogin = prefs.getString("_controllerPass");
-  print("Stored Login: $storedLogin");
+void main() { //inits app
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Browse Categories',
       theme: ThemeData(
-        // This is the theme of your application.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ListPage(),
     );
   }
 }
-//sdfsdfs
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
 
-  final String title;
-
+class ListPage extends StatefulWidget { //extends stateful widget, which declares
+  // ListPage as dynamic
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _ListPage createState() => _ListPage();
 }
 
+class _ListPage extends State<ListPage> {
+  final TextEditingController _controllerItem = TextEditingController();
+  final TextEditingController _controllerQuantity = TextEditingController();
 
-class _MyHomePageState extends State<MyHomePage> {
-  late TextEditingController _controllerName; //this is to read the login
-  late TextEditingController _controllerPass; //this is to read the password
-  // initializes the var for imagepath, starting with the question mark image
-  String _imagePath = 'assets/images/question-mark.png';
-  //lololol, I thought i had a directory error, turns out I just forgot the full
-  // dir
-  void buttonClicked(){
-    setState(() {
-      //checks password, looked up .text
-      if(_controllerPass.text =="QWERTY123"){
-        _imagePath = 'assets/images/idea.png';
-        showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Would you like to save your login and password?'),
+  // Each list entry is an item with  String(name + quantity)
+  List<Map<String, String>> _items = [];
 
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                // need to readup on this, apparently saved to a local file so
-                // I'll need admin permission?
-                SharedPreferences.getInstance().then((prefs) {
-                  prefs.setString("LoginName", _controllerName.text);
-                  prefs.setString("Password", _controllerPass.text);
-                });
+  void _addItem() {
 
-                Navigator.of(context).pop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfilePage(loginName: _controllerName.text)),
-                );
+    final name = _controllerItem.text.trim();
+    final qty  = _controllerQuantity.text.trim();
 
-              },
-
-              child: Text("Save"),
-            ),
-
-            TextButton(
-              onPressed: () {
-                SharedPreferences.getInstance().then((prefs) {
-                 prefs.remove("LoginName"); // removes saved data
-                 prefs.remove("Password"); // removes saved data
-                });
-                Navigator.of(context).pop(); // closes box
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfilePage(loginName: _controllerName.text)),
-                );
-              },
-
-              child: Text("Don't save"),
-            ),
-          ],
-
-        ),
-      );}
-      else{
-        _imagePath = 'assets/images/stop.png';}
-    });
-
+    if (name.isNotEmpty && qty.isNotEmpty) { //checks if input is completely empty
+      _items.add({'name': name, 'quantity': qty}); //adds item to Pagelist
+      _controllerItem.clear(); //clears input
+      _controllerQuantity.clear(); //clears input
+      setState(() {}); // tells app tp update the list
+    }
   }
 
-  var isChecked = false;
 
-  @override
-  void initState() { //similar to onloaded=
-    super.initState();
-
-    _controllerName = TextEditingController(); //making _controller
-    _controllerPass = TextEditingController();
-
-    SharedPreferences.getInstance().then((prefs) {
-      String? savedLogin = prefs.getString("LoginName"); // setString saves data
-      String? savedPass = prefs.getString("Password"); // here saved pass is
-      // assigned to the string savedPass
-
-      if (savedLogin != null && savedPass != null) { //checks if pass is saved
-        _controllerName.text = savedLogin; // populates fields
-        _controllerPass.text = savedPass; // populates fields
-
-        ScaffoldMessenger.of(context).showSnackBar( // displays allah-snackbar!
-          SnackBar(content: Text("Saved login details autocompleted")),
-        );
-      }
-    });
-
-  }
-
-  @override
-  void dispose() {
-    _controllerName.dispose();
-    _controllerPass.dispose();
-    super.dispose(); // free the memory of what was typed
-  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
       ),
-      body: Center(
+
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
 
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            TextField(controller: _controllerName,
-                decoration: InputDecoration(
-                    hintText:"Type here",
-                    border: OutlineInputBorder(),
-                    labelText: "Login"
-                )),
-            TextField(controller: _controllerPass,
-                decoration: InputDecoration(
-                    hintText:"Type here",
-                    border: OutlineInputBorder(),
-                    labelText: "Password"
-                )),
+            // Input Row
+            Row(
+              children: [
+                // Item Name
+                Expanded(
+                  child: TextField(
+                    controller: _controllerItem,
+                    decoration: InputDecoration(
+                      labelText: 'Item',
+                      hintText: 'Type the item here',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
 
-            ElevatedButton( onPressed: buttonClicked, child:  Text("Login")) ,
+                SizedBox(width: 12),
+
+                // Quantity
+                Expanded(
+                  child: TextField(
+                    controller: _controllerQuantity,
+                    decoration: InputDecoration(
+                      labelText: 'Qty',
+                      hintText: 'Type the quantity here',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+
+                SizedBox(width: 12),
+
+                // Add Button
+                ElevatedButton(
+                  onPressed: _addItem,
+                  child: Text('Add'),
+                ),
+              ],
+            ),
+
             SizedBox(height: 20),
-            // sets image displayed to _imagepath, the default is the quesiton mark
-            Semantics(child: Image.asset(_imagePath, width: 300, height: 300),
-                label:"Question Mark"   ),
+
+            // List or Placeholder
+            Expanded( //lab6 begins
+              child: ListView.builder(
+                itemCount: _items.length,
+                itemBuilder: (context, index) {
+                  final item = _items[index];
+                  return GestureDetector( // the delete function, activation
+                    //when the item is long pressed below
+                    onLongPress: () => _confirmDelete(index),
+
+
+                    child: Center( // delete confirmation popup
+                      child: Container(
+                          child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [ //
+                            Text(
+                              '${index + 1}. ${item['name']}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            Text(// space at start to separate the metrics
+                              ' quantity: ${item['quantity'] ?? ''}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+            ),
           ],
         ),
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  void _confirmDelete(int index) {
+    showDialog(
+      context: context,
+      builder:(context) => AlertDialog(
+        title: Text('Delete Item?'),
+        content: Text(  //references the item in question, since the alert box
+          //can block the item and I hate that.
+          'Are you sure you want to remove "${_items[index]['name']}"?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog
+            },
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed:(){
+              setState((){
+                _items.removeAt(index); // Remove item from list
+              });
+              Navigator.of(context).pop(); // Close dialog
+            },
+            child: Text('Yes'),
+          ),
+        ],
+      ),
     );
   }
 }
