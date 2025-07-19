@@ -1,109 +1,168 @@
 import 'package:flutter/material.dart';
+import 'AppList.dart';
+import 'DAO.dart';
+import 'Database.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: ListPage(),
     );
   }
 }
-//sdfsdfs
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
 
-  final String title;
-
+class ListPage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _ListPage createState() => _ListPage();
 }
 
+class _ListPage extends State<ListPage> {
+  final _controllerItem = TextEditingController();
+  final _controllerQuantity = TextEditingController();
 
-class _MyHomePageState extends State<MyHomePage> {
-  late TextEditingController _controllerName; //this is to read the login
-  late TextEditingController _controllerPass; //this is to read the password
-  // initializes the var for imagepath, starting with the question mark image
-  String _imagePath = 'assets/images/question-mark.png';
-  //lololol, I thought i had a directory error, turns out I just forgot the full
-  // dir
-  void buttonClicked(){
-    setState(() {
-      //checks password, looked up .text
-      if(_controllerPass.text =="QWERTY123"){
-        _imagePath = 'assets/images/idea.png';}
-      else{
-        _imagePath = 'assets/images/stop.png';}
-    });
-
-  }
-
-  var isChecked = false;
+  List<AppList> _items = [];
+  AppListDao? _dao;
 
   @override
-  void initState() { //similar to onloaded=
+  void initState() {
     super.initState();
-
-    _controllerName = TextEditingController(); //making _controller
-    _controllerPass = TextEditingController();
+    _initDb();
   }
 
-  @override
-  void dispose() {
-    _controllerName.dispose();
-    _controllerPass.dispose();
-    super.dispose(); // free the memory of what was typed
+  Future<void> _initDb() async {
+    final db = await $FloorAppDatabase.databaseBuilder('applist.db').build();
+    _dao = db.appListDao;
+
+    final dbItems = await _dao!.findAllItems();
+    for (var item in dbItems) {
+      if (item.id >= AppList.ID) AppList.ID = item.id + 1;
+    }
+
+    setState(() {
+      _items = dbItems;
+    });
+  }
+
+  void _addItem() async {
+    final name = _controllerItem.text.trim();
+    final qty = _controllerQuantity.text.trim();
+
+    if (name.isNotEmpty && qty.isNotEmpty) {
+      final newItem = AppList(AppList.ID++, name, qty);
+      await _dao?.insertItem(newItem);
+      _controllerItem.clear();
+      _controllerQuantity.clear();
+      setState(() => _items.add(newItem));
+    }
+  }
+
+  void _confirmDelete(int index) {
+    final item = _items[index];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Item?'),
+        content: Text('Are you sure you want to remove "${item.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _dao?.deleteItem(item);
+              setState(() => _items.removeAt(index));
+              Navigator.of(context).pop();
+            },
+            child: Text('Yes'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
-      ),
-      body: Center(
-
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(controller: _controllerName,
-                decoration: InputDecoration(
-                    hintText:"Type here",
-                    border: OutlineInputBorder(),
-                    labelText: "Login"
-                )),
-            TextField(controller: _controllerPass,
-                decoration: InputDecoration(
-                    hintText:"Type here",
-                    border: OutlineInputBorder(),
-                    labelText: "Password"
-                )),
-
-            ElevatedButton( onPressed: buttonClicked, child:  Text("Login")) ,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Input Row
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controllerItem,
+                    decoration: InputDecoration(
+                      labelText: 'Item',
+                      hintText: 'Type the item here',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _controllerQuantity,
+                    decoration: InputDecoration(
+                      labelText: 'Qty',
+                      hintText: 'Type the quantity here',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: _addItem,
+                  child: Text('Add'),
+                ),
+              ],
+            ),
             SizedBox(height: 20),
-            // sets image displayed to _imagepath, the default is the quesiton mark
-            Semantics(child: Image.asset(_imagePath, width: 300, height: 300),
-                label:"Question Mark"   ),
+
+            // List
+            Expanded(
+              child: ListView.builder(
+                itemCount: _items.length,
+                itemBuilder: (context, index) {
+                  final item = _items[index];
+                  return GestureDetector(
+                    onLongPress: () => _confirmDelete(index),
+                    child: Center(
+                      child: Container(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${index + 1}. ${item.name}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            Text(
+                              ' quantity: ${item.quantity}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
